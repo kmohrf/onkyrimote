@@ -53,6 +53,18 @@ test::python-next:
 build::arch-package:
   <<: *build_arch_pkg
 
+build::deb-package:
+  stage: build
+  image: git-registry.hack-hro.de:443/kmohrf/docker-recipes/debbuild-python:buster
+  variables:
+    PYBUILD_DISABLE: test
+  script:
+    - make dist-deb DEBIAN_BUILDPACKAGE_COMMAND="dpkg-buildpackage -sa --no-sign" DISABLE_PYTHON_TESTS=1
+  artifacts:
+    paths:
+      - build/debian
+    expire_in: 1w
+
 build::info:
   image: alpine
   stage: build
@@ -81,9 +93,24 @@ release::arch-package:
   script:
     - echo "Storing Arch Linux Package"
   artifacts:
-    expose_as: ArchLinux Package
+    expose_as: Package for ArchLinux and Derivates
     paths:
       - "python-onkyrimote-$VERSION-1-any.pkg.tar.xz"
+    expire_in: never
+
+release::deb-package:
+  stage: release
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: build::deb-package
+      artifacts: true
+  script:
+    - echo "Storing Deb Package"
+  artifacts:
+    expose_as: Package for Debian and Derivates
+    paths:
+      - build/debian
     expire_in: never
 
 release::info:

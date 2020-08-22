@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=onkyrimote
+
+%:
+	dh $@ --package python3-onkyrimote --with python3 --buildsystem pybuild --no-guessing-deps
+
+override_dh_auto_install:
+	dh_auto_install --package python3-onkyrimote --destdir debian/tmp

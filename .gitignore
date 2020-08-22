@@ -4,5 +4,15 @@ __pycache__/
 /build/
 /dist/
 /.idea/
+
+# archlinux pkg files
 /pkg/
 *.pkg.tar*
+
+# debian pkg files
+/.pybuild/
+/debian/tmp/
+/debian/*substvars
+/debian/files
+/debian/python3-onkyrimote/
+/debian/*debhelper*
