@@ -8,6 +8,16 @@ default-target: build
 .PHONY: build
 build: $(DIR_PYDIST)
 
+.PHONY: style
+style:
+	black --target-version py35 setup.py onkyrimote
+
+.PHONY: clean
+clean:
+	rm -f *.pkg.tar*
+	rm -rf pkg/
+	rm -rf *.egg-info/
+
 .PHONY: distribute-pypi
 distribute-pypi: clean $(DIR_PYDIST)
 	@if ! which twine >/dev/null 2>&1 || [ "$$(printf "1.11.0\n$$(twine --version | head -1 | cut -d" " -f3)" | sort -V | head -1)" != "1.11.0" ]; then \

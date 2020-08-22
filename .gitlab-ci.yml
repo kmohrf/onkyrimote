@@ -1,7 +1,7 @@
 stages:
   - test
   - build
-  - deploy
+  - release
 
 .run_tests: &run_tests
   stage: test
@@ -11,6 +11,18 @@ stages:
     - pip install tox
   script:
     - tox -v
+
+.build_arch_pkg: &build_arch_pkg
+  stage: build
+  image: git-registry.hack-hro.de:443/kmohrf/docker-recipes/archbuild-python
+  before_script:
+    - "echo '%wheel ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/build"
+    - useradd --create-home --user-group --groups wheel build
+  script:
+    - PKGEXT='.pkg.tar.xz' su build -- makepkg --syncdeps
+  artifacts:
+    paths:
+      - '*.pkg.tar.xz'
 
 lint:
   <<: *run_tests
@@ -37,3 +49,51 @@ test::python38:
 test::python-next:
   <<: *run_tests
   image: python:rc-alpine
+
+build::arch-package:
+  <<: *build_arch_pkg
+
+build::info:
+  image: alpine
+  stage: build
+  before_script:
+    - apk add git
+  script:
+    - echo "VERSION=$(git describe --tags | sed 's/\([^-]*-\)g/r\1/;s/-/./g;s/^v//')" >>build.env
+    - git log $(git describe --tags --abbrev=0 --first-parent HEAD^)..HEAD --pretty=format:'* %s' >CHANGELOG
+  artifacts:
+    expose_as: Changelog
+    name: CHANGELOG
+    paths:
+      - CHANGELOG
+    reports:
+      dotenv: build.env
+
+release::arch-package:
+  stage: release
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: build::arch-package
+      artifacts: true
+    - job: build::info
+      artifacts: true
+  script:
+    - echo "Storing Arch Linux Package"
+  artifacts:
+    expose_as: ArchLinux Package
+    paths:
+      - "python-onkyrimote-$VERSION-1-any.pkg.tar.xz"
+    expire_in: never
+
+release::info:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: build::info
+      artifacts: true
+  script:
+    - echo "Creating release for $CI_COMMIT_TAG"
+    - release-cli create --name "Release $CI_COMMIT_TAG" --tag-name "$CI_COMMIT_TAG" --description "$(cat CHANGELOG)"
