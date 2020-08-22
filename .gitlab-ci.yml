@@ -12,18 +12,6 @@ stages:
   script:
     - tox -v
 
-.build_arch_pkg: &build_arch_pkg
-  stage: build
-  image: git-registry.hack-hro.de:443/kmohrf/docker-recipes/archbuild-python
-  before_script:
-    - "echo '%wheel ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/build"
-    - useradd --create-home --user-group --groups wheel build
-  script:
-    - PKGEXT='.pkg.tar.xz' su build -- makepkg --syncdeps
-  artifacts:
-    paths:
-      - '*.pkg.tar.xz'
-
 lint:
   <<: *run_tests
   image: python:3.8-buster
@@ -51,7 +39,17 @@ test::python-next:
   image: python:rc-alpine
 
 build::arch-package:
-  <<: *build_arch_pkg
+  stage: build
+  image: git-registry.hack-hro.de:443/kmohrf/docker-recipes/archbuild-python
+  before_script:
+    - "echo '%wheel ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/build"
+    - useradd --create-home --user-group --groups wheel build
+  script:
+    - PKGEXT='.pkg.tar.xz' su build -- makepkg --syncdeps
+  artifacts:
+    paths:
+      - '*.pkg.tar.xz'
+    expire_in: 1w
 
 build::deb-package:
   stage: build
