@@ -1,7 +1,7 @@
 stages:
   - test
   - build
-  - deploy
+  - release
 
 .run_tests: &run_tests
   stage: test
@@ -11,6 +11,19 @@ stages:
     - pip install tox
   script:
     - tox -v
+
+.build_arch_pkg: &build_arch_pkg
+  stage: build
+  image: git-registry.hack-hro.de:443/kmohrf/docker-recipes/archbuild-python
+  before_script:
+    - "echo '%wheel ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/build"
+    - useradd --create-home --user-group --groups wheel build
+    - su build
+  script:
+    - makepkg --syncdeps
+  artifacts:
+    paths:
+      - '*.pkg.tar*'
 
 lint:
   <<: *run_tests
@@ -37,3 +50,34 @@ test::python38:
 test::python-next:
   <<: *run_tests
   image: python:rc-alpine
+
+build::arch-package:
+  <<: *build_arch_pkg
+
+build::info:
+  image: alpine/git
+  script:
+    - git log $(git describe --tags --abbrev=0 --first-parent HEAD^)..HEAD --pretty=format:'* %s' >CHANGELOG
+  artifacts:
+    expose_as: Changelog
+    name: CHANGELOG
+    paths:
+      - CHANGELOG
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - job: build::arch-package
+      artifacts: true
+    - job: build::info
+      artifacts: true
+  script:
+    - echo "Creating release for $CI_COMMIT_TAG"
+    - export CHANGELOG="$(cat CHANGELOG)"
+  release:
+    name: "Release $CI_COMMIT_TAG"
+    description: "$CHANGELOG"
+    tag_name: $CI_COMMIT_TAG
