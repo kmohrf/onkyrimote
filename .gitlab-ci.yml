@@ -1,0 +1,39 @@
+stages:
+  - test
+  - build
+  - deploy
+
+.run_tests: &run_tests
+  stage: test
+  variables:
+    TOX_SKIP_ENV: lint
+  before_script:
+    - pip install tox
+  script:
+    - tox -v
+
+lint:
+  <<: *run_tests
+  image: python:3.8-buster
+  variables:
+    TOX_SKIP_ENV: test-*
+
+test:python35:
+  <<: *run_tests
+  image: python:3.5-alpine
+
+test:python36:
+  <<: *run_tests
+  image: python:3.6-alpine
+
+test:python37:
+  <<: *run_tests
+  image: python:3.7-alpine
+
+test::python38:
+  <<: *run_tests
+  image: python:3.8-alpine
+
+test::python-next:
+  <<: *run_tests
+  image: python:rc-alpine
