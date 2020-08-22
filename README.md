@@ -26,7 +26,7 @@ onkyrimote is modular, but currently only supports [pigpio](http://abyz.me.uk/rp
 
 You’ll need the pigpio python library to continue. You can (and should) install it with your systems package manager (e.g. `apt install python3-pigpio` on Debian, Raspbian, and Raspberry Pi OS) or you may also use pip (`pip install pigpio`).
 
-If you successfully connected your receiver to your Raspberry Pi the following command should turn it on. In case you have a different device, this command might not work. You can look at the onkyrimote help – `onkyrimote --help` – for a list of supported devices. Contributions with new devices are welcome too! 
+If you have [successfully connected your receiver to your Raspberry Pi](./docs/onkyio-pi.md) the following command should turn it on. In case you have a different device, this command might not work. You can look at the onkyrimote help – `onkyrimote --help` – for a list of supported devices. Contributions with new devices are welcome too! 
 
 ```sh
 onkyrimote --gpio 17 --device onkyo_txsr304 power_on
