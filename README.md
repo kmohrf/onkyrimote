@@ -50,3 +50,7 @@ ExecStart=/usr/bin/pigpiod
 
 No other backends have been implemented yet. Feel free to contribute one!
 
+
+## Acknowledgements
+
+Thanks go out to the [onkyo-rpi](https://github.com/ahaack/onkyo-rpi) and [onkyo-ri](https://github.com/docbender/Onkyo-RI) projects that have similar goals and have been used for reference!
