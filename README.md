@@ -1,6 +1,6 @@
 # onkyrimote
 
-A python-library and command line utility for controlling ONKYO receivers that support the analog RI protocol.
+A python-library and command line utility for controlling Onkyo receivers that support the RI protocol.
 
 ## Installation
 

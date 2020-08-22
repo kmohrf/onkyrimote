@@ -16,7 +16,7 @@ except FileNotFoundError:
 setup(
     name="onkyrimote",
     version=__version__,
-    description="Python library and command line utility for controlling ONKYO receivers through the analog RI protocol.",
+    description="Python library and command line utility for controlling Onkyo receivers through the RI protocol.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kmohrf/onkyrimote",
