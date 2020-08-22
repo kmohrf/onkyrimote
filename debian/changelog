@@ -1,3 +1,9 @@
+onkyrimote (0.2.0-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Konrad Mohrfeldt <konrad.mohrfeldt@farbdev.org>  Sun, 23 Aug 2020 00:31:18 +0200
+
 onkyrimote (0.1.0-1) unstable; urgency=medium
 
   * Initial release.
