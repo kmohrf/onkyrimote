@@ -74,7 +74,6 @@ build::info:
     - echo "VERSION=$(git describe --tags | sed 's/\([^-]*-\)g/r\1/;s/-/./g;s/^v//')" >>build.env
     - git log $(git describe --tags --abbrev=0 --first-parent HEAD^)..HEAD --pretty=format:'* %s' >CHANGELOG
   artifacts:
-    expose_as: Changelog
     name: CHANGELOG
     paths:
       - CHANGELOG
@@ -93,7 +92,7 @@ release::arch-package:
   script:
     - echo "Storing Arch Linux Package"
   artifacts:
-    expose_as: Package for ArchLinux and Derivates
+    name: Package for ArchLinux and Derivates
     paths:
       - "python-onkyrimote-$VERSION-1-any.pkg.tar.xz"
     expire_in: never
@@ -108,7 +107,7 @@ release::deb-package:
   script:
     - echo "Storing Deb Package"
   artifacts:
-    expose_as: Package for Debian and Derivates
+    name: Package for Debian and Derivates
     paths:
       - build/debian
     expire_in: never
